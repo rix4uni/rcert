@@ -17,8 +17,6 @@ process_domain() {
     done
 
     rm -rf wildcards[0-9]*.txt
-
-    echo "Finished processing domain: $DOMAIN"
 }
 
 # Check if an argument is provided
