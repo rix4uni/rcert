@@ -2,7 +2,6 @@
 
 process_domain() {
     local DOMAIN=$1
-    echo "Processing domain: $DOMAIN"
 
     echo "$DOMAIN" >> wildcards1.txt
 
