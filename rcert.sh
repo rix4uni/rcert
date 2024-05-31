@@ -8,7 +8,7 @@ process_domain() {
     local counter=1
 
     while true; do
-        cat "wildcards${counter}.txt" | sed 's/*.//' | certinfo | jq -r '.Certificate_Subject_Alternative_Name // empty | .[]' | unew -p "$DOMAIN".txt | tee -a "wildcards$((counter + 1)).txt"
+        cat "wildcards${counter}.txt" | sed 's/*.//' | certinfo | jq -r '.Certificate_Subject_Alternative_Name // empty | .[]' | unew "$DOMAIN".txt | tee -a "wildcards$((counter + 1)).txt"
         if [ ! -s "wildcards$((counter + 1)).txt" ]; then
             break
         fi
