@@ -1,0 +1,76 @@
+#!/bin/bash
+
+process_domain() {
+    local DOMAIN=$1
+    local DIR=$2  # Directory to save wildcard files
+
+    echo "$DOMAIN" >> "$DIR/wildcards1.txt"
+
+    local counter=1
+
+    while true; do
+        cat "$DIR/wildcards${counter}.txt" | sed 's/*.//' | certinfo -silent -c 50 | unew "$DIR/output.txt" | tee -a "$DIR/wildcards$((counter + 1)).txt"
+        if [ ! -s "$DIR/wildcards$((counter + 1)).txt" ]; then
+            break
+        fi
+        counter=$((counter + 1))
+    done
+}
+
+# Usage function to show how the script should be used
+usage() {
+    echo "Usage Examples:"
+    echo "  $0 -d <domain>"
+    echo "  $0 -list <domain_file>"
+    exit 1
+}
+
+# Check if any flags are provided
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+# Parse command-line arguments
+while [[ "$1" =~ ^- ]]; do
+    case "$1" in
+        -d)  # Process a single domain
+            DOMAIN=$2
+            INPUT_TYPE="domain"
+            shift 2  # Skip the domain argument
+            ;;
+        -list)  # Process a file of domains
+            DOMAIN_FILE=$2
+            INPUT_TYPE="file"
+            shift 2  # Skip the file argument
+            ;;
+        *)  # Invalid option
+            usage
+            ;;
+    esac
+done
+
+# Ensure that we received either a domain or a domain file
+if [ -z "$INPUT_TYPE" ]; then
+    usage
+fi
+
+# Create a random directory for the files
+RANDOM_DIR=$(mktemp -d)
+
+# Process domains based on input type
+if [ "$INPUT_TYPE" == "file" ]; then
+    if [ ! -f "$DOMAIN_FILE" ]; then
+        echo "File $DOMAIN_FILE not found!"
+        exit 1
+    fi
+
+    while IFS= read -r DOMAIN; do
+        process_domain "$DOMAIN" "$RANDOM_DIR"
+    done < "$DOMAIN_FILE"
+else
+    # It's a single domain
+    process_domain "$DOMAIN" "$RANDOM_DIR"
+fi
+
+# After processing, clean up the temporary directory
+rm -rf "$RANDOM_DIR"

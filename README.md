@@ -1,21 +1,38 @@
-# rcert
-Recursive Certificate_Subject_Alternative_Name Scan
+## rcert
+Recursive subdomain enumeration of Certificate_Subject_Alternative_Name using `certinfo`
 
-This tool Recursively scans Certificate_Subject_Alternative_Name domain using `certinfo` and prints only unique output and also saves output in a given the domain name $DOMAIN.txt like this `google.com.txt`
+## Prerequisites
+```
+go install github.com/rix4uni/certinfo@latest
+go install -v github.com/rix4uni/unew@latest
+```
 
 ## Installation
 ```
 git clone https://github.com/rix4uni/rcert.git
-cd rcert && chmod +x rcert.sh
+cd rcert
+chmod +x rcert
+mv rcert /usr/bin/
 ```
 
 ## Usage
 Single Domain:
 ```
-bash rcert.sh google.com
+rcert -d google.com
 ```
 
 Multiple Domains:
 ```
-bash rcert.sh domains.txt
+rcert -list domains.txt
+```
+
+## Comparison why `rcert` useful
+```
+▶ echo "xapi.stg.xfinity.com" | certinfo -silent | wc -l
+69
+```
+
+```
+▶ rcert -d xapi.stg.xfinity.com | wc -l
+130
 ```
